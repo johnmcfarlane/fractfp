@@ -12,6 +12,11 @@ set(CMAKE_CXX_STANDARD 14)
 set(SOURCE_FILES main.cpp)
 add_executable(mandelbrot ${SOURCE_FILES})
 
+set_target_properties(
+        mandelbrot
+        PROPERTIES COMPILE_FLAGS "-msse4.2 -DSG14_USE_INT128 -Wall -Wextra"
+)
+
 ################################################################################
 # fixed_point
 
@@ -20,10 +25,9 @@ include(ExternalProject)
 ExternalProject_Add(
         fixed_point
         GIT_REPOSITORY "https://github.com/johnmcfarlane/fixed_point.git"
-        GIT_TAG "5981df93c08b9ebada171e8ca3dd64c160d32893"
+        GIT_TAG "376e6d5aeb896c19bdf759b1661fb7f31fb4631c"
         UPDATE_COMMAND ""
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-        BUILD_COMMAND ${CMAKE_COMMAND} --build . --target fixed_point
+        BUILD_COMMAND ""
         INSTALL_COMMAND ""
 )
 
@@ -56,5 +60,6 @@ target_include_directories(
 
 add_dependencies(
         mandelbrot
+        fixed_point
         boost.simd
 )
