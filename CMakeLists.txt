@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 14)
 ################################################################################
 # mandelbrot target
 
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cpp mandelbrot.h)
 add_executable(mandelbrot ${SOURCE_FILES})
 
 set_target_properties(
