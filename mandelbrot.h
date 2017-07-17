@@ -150,7 +150,7 @@ namespace mandelbrot {
 
                         pack_traits::scalar_traits::set(
                                 c_x_pack,
-                                (int) element_index,
+                                element_index,
                                 geometry.origin[0] + absolute_point_column * dx[0] + absolute_point_row * dy[0]);
                         pack_traits::scalar_traits::set(
                                 c_y_pack,
