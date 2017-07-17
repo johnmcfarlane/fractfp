@@ -12,9 +12,14 @@ set(CMAKE_CXX_STANDARD 14)
 set(SOURCE_FILES main.cpp mandelbrot.h)
 add_executable(mandelbrot ${SOURCE_FILES})
 
+set(CXX_FLAGS "-msse4.2 -DSG14_USE_INT128 -Wall -Wextra")
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
+set(CXX_FLAGS "${CXX_FLAGS} -faligned-new -mavx2")
+endif (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
+
 set_target_properties(
         mandelbrot
-        PROPERTIES COMPILE_FLAGS "-msse4.2 -DSG14_USE_INT128 -Wall -Wextra"
+        PROPERTIES COMPILE_FLAGS ${CXX_FLAGS}
 )
 
 ################################################################################
@@ -25,7 +30,7 @@ include(ExternalProject)
 ExternalProject_Add(
         fixed_point
         GIT_REPOSITORY "https://github.com/johnmcfarlane/fixed_point.git"
-        GIT_TAG "376e6d5aeb896c19bdf759b1661fb7f31fb4631c"
+        GIT_TAG "4b7d9ea83c7657839c908ccd3ad870dd78993ffc"
         UPDATE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
