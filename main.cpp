@@ -46,7 +46,7 @@ namespace mandelbrot {
         using scalar = sg14::fixed_point<Rep, Exponent>;
 
         using _fixed_point_rep = std::conditional_t<
-                override_pack_size,
+                override_pack_size!=0,
                 boost::simd::pack<Rep, override_pack_size>,
                 boost::simd::pack<Rep>>;
 
