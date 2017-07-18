@@ -12,10 +12,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(SOURCE_FILES main.cpp mandelbrot.h)
 add_executable(mandelbrot ${SOURCE_FILES})
 
-set(CXX_FLAGS "-msse4.2 -DSG14_USE_INT128 -Wall -Wextra")
-if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
-set(CXX_FLAGS "${CXX_FLAGS} -faligned-new -mavx2")
-endif (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
+set(CXX_FLAGS "-mavx -DSG14_USE_INT128 -Wall -Wextra")
 
 set_target_properties(
         mandelbrot
