@@ -111,10 +111,8 @@ namespace mandelbrot {
 
             counters = boost::simd::if_inc(confined, counters);
 
-            auto const x_temp = xx - yy + c_x;
-
             y = 2 * x * y + c_y;
-            x = x_temp;
+            x = xx - yy + c_x;
         }
 
         return counters;
