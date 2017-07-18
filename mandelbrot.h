@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/simd/memory/allocate.hpp>
+#include <boost/simd/memory/allocator.hpp>
 #include <boost/simd/pack.hpp>
 
 #include <memory>
@@ -65,6 +67,9 @@ namespace mandelbrot {
     template<typename T>
     using vec2 = boost::simd::pack<T, 2>;
 
+    template<typename T>
+    using unique_ptr = std::unique_ptr<T, boost::simd::aligned_delete>;
+
     ////////////////////////////////////////////////////////////////////////////////
     // utility fns
 
@@ -120,7 +125,7 @@ namespace mandelbrot {
 
     template<typename Scalar>
     void generate_c(Geometry<Scalar> const &geometry,
-                    vec2<std::unique_ptr<typename scalar_traits<Scalar>::scalar_pack[]> > &c) {
+                    vec2<unique_ptr<typename scalar_traits<Scalar>::scalar_pack[]> > &c) {
         using scalar = Scalar;
         using pack_traits = mandelbrot::pack_traits<scalar>;
         auto const block_resolution = vec2<int>{
@@ -162,11 +167,11 @@ namespace mandelbrot {
 
     template<typename Scalar>
     auto extract_results(
-            std::unique_ptr<typename pack_traits<Scalar>::integer_pack[]> &counters,
+            unique_ptr<typename pack_traits<Scalar>::integer_pack[]> const& counters,
             vec2<int> const block_resolution, vec2<int> const resolution) {
         using pack_traits = mandelbrot::pack_traits<Scalar>;
         auto const num_points = static_cast<std::size_t>(resolution[0]) * resolution[1];
-        auto subset = std::unique_ptr<int[]>(new int[num_points]);
+        auto subset = unique_ptr<int[]>(boost::simd::allocate<int>(num_points));
         for (auto point_row = 0; point_row != resolution[1]; ++point_row) {
             auto block_row = point_row >> pack_traits::block_height_shift;
 
@@ -200,17 +205,19 @@ namespace mandelbrot {
         auto const num_blocks = block_resolution[0] * block_resolution[1];
 
         // for each point for each block
-        vec2<std::unique_ptr<scalar_pack[]>> c;
+        vec2<unique_ptr<scalar_pack[]>> c;
 
         // allocate c
-        c[0].reset(new scalar_pack[num_blocks]);
-        c[1].reset(new scalar_pack[num_blocks]);
+        for (auto& c_axis : c) {
+            c_axis.reset(reinterpret_cast<scalar_pack*>(boost::alignment::aligned_alloc(alignof(scalar_pack), num_blocks*sizeof(scalar_pack))));
+        }
 
         // calculate c
         generate_c<Scalar>(geometry, c);
 
         // generate set
-        auto counters = std::unique_ptr<integer_pack[]>{new integer_pack[num_blocks]};
+        auto const counters = unique_ptr<integer_pack[]>(
+                reinterpret_cast<integer_pack*>(boost::alignment::aligned_alloc(alignof(integer_pack), num_blocks*sizeof(integer_pack))));
         for (auto i = 0; i != num_blocks; ++i) {
             counters[i] = calculate<Scalar>(c[0][i], c[1][i], limit);
         }
