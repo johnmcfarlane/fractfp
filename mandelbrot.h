@@ -95,8 +95,8 @@ namespace mandelbrot {
 
         auto x = c_x;
         auto y = c_y;
-        auto const radius = typename pack_traits::scalar_pack{2};
-        auto const radius_sq = radius*radius;
+        static auto const radius = typename pack_traits::scalar_pack{2};
+        static auto const radius_sq = radius*radius;
         auto confined = decltype(radius_sq <= radius_sq){true};
 
         while (limit--) {
