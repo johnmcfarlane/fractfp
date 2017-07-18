@@ -3,6 +3,9 @@
 #include <sg14/auxiliary/boost.simd.h>
 
 namespace {
+    // zero = no override
+    constexpr auto override_pack_size = std::size_t{};
+
     constexpr auto use_fixed_point = true;
     constexpr auto print_stats = true;
 }
@@ -40,9 +43,16 @@ namespace {
 namespace mandelbrot {
     template<typename Rep, int Exponent>
     struct scalar_traits<sg14::fixed_point<Rep, Exponent>> {
-        using rep = Rep;
         using scalar = sg14::fixed_point<Rep, Exponent>;
-        using scalar_pack = sg14::fixed_point<boost::simd::pack<rep>, Exponent>;
+
+        using _fixed_point_rep = std::conditional_t<
+                override_pack_size,
+                boost::simd::pack<Rep, override_pack_size>,
+                boost::simd::pack<Rep>>;
+
+        using scalar_pack = sg14::fixed_point<_fixed_point_rep, Exponent>;
+
+        static constexpr auto pack_size = scalar_pack::rep::static_size;
 
         static void set(scalar_pack &fpp, int index, scalar const &value) noexcept {
             fpp.data()[index] = value.data();

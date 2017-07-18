@@ -7,9 +7,10 @@
 namespace mandelbrot {
     template<typename Scalar>
     struct scalar_traits {
-        using rep = Scalar;
         using scalar = Scalar;
         using scalar_pack = boost::simd::pack<scalar>;
+
+        static constexpr auto pack_size = scalar_pack::static_size;
 
         static void set(scalar_pack &p, int index, scalar value) noexcept {
             p[index] = value;
@@ -33,11 +34,10 @@ namespace mandelbrot {
         using scalar_traits = mandelbrot::scalar_traits<Scalar>;
         using scalar = typename scalar_traits::scalar;
         using scalar_pack = typename scalar_traits::scalar_pack;
-        using rep = typename scalar_traits::rep;
 
         using coordinate = boost::simd::pack<scalar, 2>;
 
-        constexpr static auto pack_size = boost::simd::pack<rep>::static_size;
+        constexpr static auto pack_size = scalar_traits::pack_size;
         constexpr static auto pack_shift = log2<pack_size>();
 
         // block constants
@@ -53,8 +53,8 @@ namespace mandelbrot {
         constexpr static auto block_width_mask = block_width - 1;
         constexpr static auto block_height_mask = block_height - 1;
 
-        template<typename T>
-        using pack = boost::simd::pack<T, pack_size>;
+        template<typename T, std::size_t N = pack_size>
+        using pack = boost::simd::pack<T, N>;
 
         using integer_pack = pack<int>;
     };
