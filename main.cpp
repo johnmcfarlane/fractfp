@@ -1,6 +1,6 @@
 #include "mandelbrot.h"
 
-#include <sg14/auxiliary/boost.simd.h>
+#include <cnl/auxiliary/boost.simd.h>
 
 namespace {
     // zero = no override
@@ -42,15 +42,15 @@ namespace {
 
 namespace mandelbrot {
     template<typename Rep, int Exponent>
-    struct scalar_traits<sg14::fixed_point<Rep, Exponent>> {
-        using scalar = sg14::fixed_point<Rep, Exponent>;
+    struct scalar_traits<cnl::fixed_point<Rep, Exponent>> {
+        using scalar = cnl::fixed_point<Rep, Exponent>;
 
         using _fixed_point_rep = std::conditional_t<
                 override_pack_size!=0,
                 boost::simd::pack<Rep, override_pack_size>,
                 boost::simd::pack<Rep>>;
 
-        using scalar_pack = sg14::fixed_point<_fixed_point_rep, Exponent>;
+        using scalar_pack = cnl::fixed_point<_fixed_point_rep, Exponent>;
 
         static constexpr auto pack_size = scalar_pack::rep::static_size;
 
@@ -65,7 +65,7 @@ int main() {
 
     using scalar = std::conditional_t<
             use_fixed_point,
-            sg14::fixed_point<std::int64_t, -28>,
+            cnl::fixed_point<std::int64_t, -28>,
             float>;
 
     auto const resolution = vec2<int>{80, 40};

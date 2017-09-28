@@ -20,20 +20,20 @@ set_target_properties(
 )
 
 ################################################################################
-# fixed_point
+# cnl
 
 include(ExternalProject)
 
 ExternalProject_Add(
-        fixed_point
-        GIT_REPOSITORY "https://github.com/johnmcfarlane/fixed_point.git"
-        GIT_TAG "4b7d9ea83c7657839c908ccd3ad870dd78993ffc"
+        cnl
+        GIT_REPOSITORY "https://github.com/johnmcfarlane/cnl.git"
+        GIT_TAG "754e4c65567d843081fb4cf45552764c35e30130"
         UPDATE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
 )
 
-ExternalProject_Get_Property(fixed_point source_dir)
+ExternalProject_Get_Property(cnl source_dir)
 target_include_directories(
         mandelbrot
         PRIVATE
@@ -46,8 +46,8 @@ target_include_directories(
 
 ExternalProject_Add(
         boost.simd
-        URL "https://github.com/johnmcfarlane/boost.simd/archive/5d67a72d77411dc610126151a182ebbae1bfbac6.zip"
-        URL_MD5 "97d1aad967965ee79a751d099cd0ee6f"
+        URL "https://github.com/johnmcfarlane/boost.simd/archive/b1e046e3ffa720226e45512c76c505f34cde7be2.zip"
+        URL_MD5 "74fc0bc279a18f931e4d2ec026af8dd4"
         UPDATE_COMMAND ""
         INSTALL_COMMAND ""
 )
@@ -60,8 +60,22 @@ target_include_directories(
         "${source_dir}/include"
 )
 
+######################################################################
+# Boost
+
+find_package(Boost REQUIRED)
+
+if(Boost_VERSION LESS 106200)
+    message(FATAL_ERROR "Boost version 1.62 is required by Boost.SIMD")
+endif(Boost_VERSION LESS 106200)
+
+target_link_libraries(mandelbrot Boost::boost)
+
+######################################################################
+
 add_dependencies(
         mandelbrot
-        fixed_point
+        cnl
         boost.simd
+        Boost::boost
 )
